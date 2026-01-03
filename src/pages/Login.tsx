@@ -54,7 +54,7 @@ export function Login() {
         {/* Logo et Titre */}
         <div className="text-center mb-8">
           <img 
-            src="/africa-mobilier-logo.png" 
+            src="/africa-mobilier-logo2.png" 
             alt="Africa Mobilier" 
             className="h-40 mx-auto mb-4"
           />
