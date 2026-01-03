@@ -170,31 +170,6 @@ export function Login() {
               )}
             </button>
           </form>
-
-          {/* Informations de test */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center mb-2">
-              Comptes de test disponibles :
-            </p>
-            <div className="space-y-1 text-xs text-gray-600">
-              <div className="flex justify-between">
-                <span>Admin:</span>
-                <span className="font-mono">admin@africamobilier.ma</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Directeur Général:</span>
-                <span className="font-mono">dg@africamobilier.ma</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Directeur Commercial:</span>
-                <span className="font-mono">dc@africamobilier.ma</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Commercial:</span>
-                <span className="font-mono">commercial@africamobilier.ma</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
