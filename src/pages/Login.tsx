@@ -59,7 +59,7 @@ export function Login() {
             className="h-40 mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold text-white mb-2">
-            Africa Mobilier ERP
+            Système de Gestion Interne
           </h1>
           <p className="text-primary-100">
             Excellence marocaine, Vision africaine

@@ -61,9 +61,14 @@ export function Layout({ children }: LayoutProps) {
   };
 
   // Filtrer les items du menu selon les permissions
-  const visibleMenuItems = menuItems.filter(item => 
-    hasPermission(item.module, 'read')
-  );
+  const visibleMenuItems = menuItems.filter(item => {
+    // WooCommerce : seulement admin et DG
+    if (item.module === 'woocommerce') {
+      return profile?.role === 'admin' || profile?.role === 'directeur_general';
+    }
+    // Autres items : vérifier les permissions normalement
+    return hasPermission(item.module, 'read');
+  });
 
   return (
     <div className="flex h-screen bg-gray-50">
