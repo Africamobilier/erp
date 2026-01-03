@@ -357,65 +357,69 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      if (user) {
-        // Mise à jour
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({
+  try {
+    if (user) {
+      // Mise à jour
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          nom: formData.nom,
+          prenom: formData.prenom,
+          role: formData.role,
+          telephone: formData.telephone,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      toast.success('Utilisateur mis à jour avec succès');
+    } else {
+      // Création
+      if (formData.password !== formData.confirmPassword) {
+        toast.error('Les mots de passe ne correspondent pas');
+        setLoading(false);
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        toast.error('Le mot de passe doit contenir au moins 6 caractères');
+        setLoading(false);
+        return;
+      }
+
+      // Créer l'utilisateur via Supabase Auth signUp
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
             nom: formData.nom,
             prenom: formData.prenom,
             role: formData.role,
-            telephone: formData.telephone,
-          })
-          .eq('id', user.id);
-
-        if (error) throw error;
-        toast.success('Utilisateur mis à jour avec succès');
-      } else {
-        // Création
-        if (formData.password !== formData.confirmPassword) {
-          toast.error('Les mots de passe ne correspondent pas');
-          setLoading(false);
-          return;
-        }
-
-        if (formData.password.length < 6) {
-          toast.error('Le mot de passe doit contenir au moins 6 caractères');
-          setLoading(false);
-          return;
-        }
-
-        // Créer l'utilisateur via Supabase Auth signUp
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: {
-              nom: formData.nom,
-              prenom: formData.prenom,
-              role: formData.role,
-            },
           },
-        });
+        },
+      });
 
-        if (signUpError) throw signUpError;
+      if (signUpError) throw signUpError;
 
-        toast.success('Utilisateur créé avec succès. Un email de confirmation a été envoyé.');
-      }
+      toast.success('Utilisateur créé avec succès. Rechargement...');
 
-      onSave();
-    } catch (error: any) {
-      console.error('Erreur:', error);
-      toast.error(error.message || 'Erreur lors de la sauvegarde');
-    } finally {
-      setLoading(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }
-  };
+
+    onSave();
+  } catch (error: any) {
+    console.error('Erreur:', error);
+    toast.error(error.message || 'Erreur lors de la sauvegarde');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
