@@ -277,7 +277,7 @@ export class WooCommerceService {
             }
 
             // Trouver ou créer le client
-            // Les données YITH sont dans meta_data, pas dans billing
+            // Les données YITH sont dans meta_data
             const getMetaValue = (key: string) => {
               const meta = order.meta_data?.find(m => m.key === key);
               return meta?.value || '';
@@ -286,9 +286,12 @@ export class WooCommerceService {
             // Récupérer les données du formulaire YITH
             const yithName = getMetaValue('ywraq_customer_name') || getMetaValue('_ywraq_customer_name');
             const yithEmail = getMetaValue('ywraq_customer_email') || getMetaValue('_ywraq_customer_email') || order.billing.email;
-            const yithPhone = getMetaValue('ywraq_customer_phone') || getMetaValue('_ywraq_customer_phone') || order.billing.phone;
-            const yithCity = getMetaValue('ywraq_customer_city') || getMetaValue('_ywraq_customer_city') || order.billing.city;
             const yithMessage = getMetaValue('ywraq_customer_message') || getMetaValue('_ywraq_customer_message');
+            
+            // Les champs personnalisés (Téléphone, Ville) sont dans ywraq_other_email_fields
+            const otherFields = getMetaValue('ywraq_other_email_fields') || {};
+            const yithPhone = otherFields['Téléphone'] || otherFields['Telephone'] || order.billing.phone || '';
+            const yithCity = otherFields['Ville'] || otherFields['City'] || order.billing.city || '';
 
             // Utiliser les données YITH en priorité, sinon billing
             const clientName = yithName || `${order.billing.first_name} ${order.billing.last_name}`.trim() || 'Client';
