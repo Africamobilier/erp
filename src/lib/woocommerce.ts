@@ -141,42 +141,98 @@ export class WooCommerceService {
       let synced = 0;
 
       for (const product of products) {
-        // Les prix WooCommerce sont déjà en HT
-        const prixHT = parseFloat(product.price || product.regular_price || '0');
+        // Si c'est un produit variable, récupérer ses variations
+        if (product.type === 'variable') {
+          try {
+            const variationsResponse = await this.makeRequest(
+              `/wp-json/wc/v3/products/${product.id}/variations?per_page=100`
+            );
+            const variations = await variationsResponse.json();
 
-        const produitData: Partial<Produit> = {
-          code_produit: product.sku || `WC-${product.id}`,
-          designation: product.name,
-          description: product.description,
-          categorie: product.categories[0]?.name,
-          prix_unitaire_ht: prixHT,
-          stock_disponible: product.stock_quantity || 0,
-          woocommerce_id: product.id,
-          image_url: product.images[0]?.src,
-          actif: true,
-        };
+            // Créer un produit pour chaque variation
+            for (const variation of variations) {
+              const prixHT = parseFloat(variation.price || variation.regular_price || '0');
+              
+              // Construire le nom avec les attributs (ex: "Chaise Bureau - Couleur: Rouge, Taille: L")
+              const attributesText = variation.attributes
+                ?.map((attr: any) => `${attr.name}: ${attr.option}`)
+                .join(', ') || '';
+              
+              const designation = attributesText 
+                ? `${product.name} - ${attributesText}`
+                : product.name;
 
-        // Vérifier si le produit existe déjà
-        const { data: existing, error: existingError } = await supabase
-          .from('produits')
-          .select('id')
-          .eq('woocommerce_id', product.id)
-          .maybeSingle(); // ← Utiliser maybeSingle() au lieu de single()
+              const produitData: Partial<Produit> = {
+                code_produit: variation.sku || `WC-${product.id}-${variation.id}`,
+                designation: designation,
+                description: variation.description || product.description,
+                categorie: product.categories[0]?.name,
+                prix_unitaire_ht: prixHT,
+                stock_disponible: variation.stock_quantity || 0,
+                woocommerce_id: variation.id, // ID de la variation
+                image_url: variation.image?.src || product.images[0]?.src,
+                actif: true,
+              };
 
-        if (existing) {
-          // Mise à jour
-          await supabase
-            .from('produits')
-            .update(produitData)
-            .eq('id', existing.id);
+              // Vérifier si cette variation existe déjà
+              const { data: existing } = await supabase
+                .from('produits')
+                .select('id')
+                .eq('woocommerce_id', variation.id)
+                .maybeSingle();
+
+              if (existing) {
+                await supabase
+                  .from('produits')
+                  .update(produitData)
+                  .eq('id', existing.id);
+              } else {
+                await supabase
+                  .from('produits')
+                  .insert(produitData);
+              }
+
+              synced++;
+            }
+          } catch (error) {
+            console.error(`Erreur récupération variations pour produit ${product.id}:`, error);
+          }
         } else {
-          // Création
-          await supabase
-            .from('produits')
-            .insert(produitData);
-        }
+          // Produit simple (sans variations)
+          const prixHT = parseFloat(product.price || product.regular_price || '0');
 
-        synced++;
+          const produitData: Partial<Produit> = {
+            code_produit: product.sku || `WC-${product.id}`,
+            designation: product.name,
+            description: product.description,
+            categorie: product.categories[0]?.name,
+            prix_unitaire_ht: prixHT,
+            stock_disponible: product.stock_quantity || 0,
+            woocommerce_id: product.id,
+            image_url: product.images[0]?.src,
+            actif: true,
+          };
+
+          // Vérifier si le produit existe déjà
+          const { data: existing } = await supabase
+            .from('produits')
+            .select('id')
+            .eq('woocommerce_id', product.id)
+            .maybeSingle();
+
+          if (existing) {
+            await supabase
+              .from('produits')
+              .update(produitData)
+              .eq('id', existing.id);
+          } else {
+            await supabase
+              .from('produits')
+              .insert(produitData);
+          }
+
+          synced++;
+        }
       }
 
       await this.logSync('products', 'success', `${synced} produits synchronisés`);
