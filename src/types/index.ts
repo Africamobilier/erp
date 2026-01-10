@@ -375,6 +375,11 @@ export interface WooCommerceOrder {
     total: string;
     price: number;
   }>;
+  meta_data?: Array<{
+    id: number;
+    key: string;
+    value: any;
+  }>;
   payment_method?: string;
   payment_method_title?: string;
 }

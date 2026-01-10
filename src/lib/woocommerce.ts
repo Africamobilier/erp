@@ -277,6 +277,25 @@ export class WooCommerceService {
             }
 
             // Trouver ou créer le client
+            // Les données YITH sont dans meta_data, pas dans billing
+            const getMetaValue = (key: string) => {
+              const meta = order.meta_data?.find(m => m.key === key);
+              return meta?.value || '';
+            };
+
+            // Récupérer les données du formulaire YITH
+            const yithName = getMetaValue('ywraq_customer_name') || getMetaValue('_ywraq_customer_name');
+            const yithEmail = getMetaValue('ywraq_customer_email') || getMetaValue('_ywraq_customer_email') || order.billing.email;
+            const yithPhone = getMetaValue('ywraq_customer_phone') || getMetaValue('_ywraq_customer_phone') || order.billing.phone;
+            const yithCity = getMetaValue('ywraq_customer_city') || getMetaValue('_ywraq_customer_city') || order.billing.city;
+            const yithMessage = getMetaValue('ywraq_customer_message') || getMetaValue('_ywraq_customer_message');
+
+            // Utiliser les données YITH en priorité, sinon billing
+            const clientName = yithName || `${order.billing.first_name} ${order.billing.last_name}`.trim() || 'Client';
+            const clientEmail = yithEmail;
+            const clientPhone = yithPhone;
+            const clientCity = yithCity;
+
             let { data: client } = await supabase
               .from('clients')
               .select('id')
@@ -288,16 +307,17 @@ export class WooCommerceService {
               const { data: newClient } = await supabase
                 .from('clients')
                 .insert({
-                  raison_sociale: order.billing.company || `${order.billing.first_name} ${order.billing.last_name}`,
-                  nom_contact: `${order.billing.first_name} ${order.billing.last_name}`,
-                  email: order.billing.email,
-                  telephone: order.billing.phone,
-                  adresse: `${order.billing.address_1} ${order.billing.address_2}`.trim(),
-                  ville: order.billing.city,
+                  raison_sociale: order.billing.company || clientName,
+                  nom_contact: clientName,
+                  email: clientEmail,
+                  telephone: clientPhone,
+                  adresse: `${order.billing.address_1} ${order.billing.address_2}`.trim() || 'Non renseignée',
+                  ville: clientCity,
                   code_postal: order.billing.postcode,
                   source: 'woocommerce',
                   woocommerce_id: order.customer_id,
                   type: 'prospect',
+                  notes: yithMessage ? `Message client : ${yithMessage}` : undefined,
                 })
                 .select()
                 .single();
@@ -310,16 +330,16 @@ export class WooCommerceService {
               const { data: newClient } = await supabase
                 .from('clients')
                 .insert({
-                  raison_sociale: order.billing.company || `${order.billing.first_name} ${order.billing.last_name}`,
-                  nom_contact: `${order.billing.first_name} ${order.billing.last_name}`,
-                  email: order.billing.email,
-                  telephone: order.billing.phone,
-                  adresse: `${order.billing.address_1} ${order.billing.address_2}`.trim(),
-                  ville: order.billing.city,
+                  raison_sociale: order.billing.company || clientName,
+                  nom_contact: clientName,
+                  email: clientEmail,
+                  telephone: clientPhone,
+                  adresse: `${order.billing.address_1} ${order.billing.address_2}`.trim() || 'Non renseignée',
+                  ville: clientCity,
                   code_postal: order.billing.postcode,
                   source: 'woocommerce',
                   type: 'prospect',
-                  notes: `Client invité WooCommerce - Demande #${order.id}`,
+                  notes: `Client invité WooCommerce - Demande #${order.id}${yithMessage ? `\nMessage: ${yithMessage}` : ''}`,
                 })
                 .select()
                 .single();
