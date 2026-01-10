@@ -247,8 +247,14 @@ export class WooCommerceService {
 
   async syncOrders(): Promise<{ success: boolean; count: number }> {
     try {
-      // Synchroniser les commandes en attente ET les demandes de devis
-      const statuses = ['pending', 'quote-requested', 'on-hold'];
+      // Synchroniser les demandes de devis YITH et les commandes en attente
+      const statuses = [
+        'ywraq-new',      // Nouvelle demande de devis YITH
+        'ywraq-pending',  // Demande en attente YITH
+        'ywraq-accepted', // Demande acceptée YITH
+        'pending',        // Commande en attente de paiement
+        'on-hold'         // Commande en attente
+      ];
       let synced = 0;
 
       for (const status of statuses) {
@@ -262,7 +268,7 @@ export class WooCommerceService {
               .from('devis')
               .select('id')
               .eq('woocommerce_quote_id', order.id)
-              .maybeSingle(); // ← Correction
+              .maybeSingle();
 
             if (existingDevis) {
               console.log(`Devis WC #${order.id} déjà importé, ignoré`);
@@ -274,7 +280,7 @@ export class WooCommerceService {
               .from('clients')
               .select('id')
               .eq('woocommerce_id', order.customer_id)
-              .maybeSingle(); // ← Correction
+              .maybeSingle();
 
             if (!client && order.customer_id > 0) {
               // Créer le client s'il n'existe pas
@@ -312,7 +318,7 @@ export class WooCommerceService {
                   code_postal: order.billing.postcode,
                   source: 'woocommerce',
                   type: 'prospect',
-                  notes: `Client invité WooCommerce - Commande #${order.id}`,
+                  notes: `Client invité WooCommerce - Demande #${order.id}`,
                 })
                 .select()
                 .single();
@@ -328,12 +334,14 @@ export class WooCommerceService {
             const montantTVA = montantHT * 0.20;
             const montantTTC = montantHT + montantTVA;
 
-            // Déterminer le statut du devis selon le statut WooCommerce
+            // Déterminer le statut du devis selon le statut WooCommerce YITH
             let statutDevis: 'brouillon' | 'envoyé' | 'accepté' = 'envoyé';
-            if (status === 'quote-requested') {
-              statutDevis = 'envoyé'; // Demande de devis = devis envoyé au client
-            } else if (status === 'pending') {
-              statutDevis = 'envoyé'; // En attente de paiement = devis envoyé
+            if (status === 'ywraq-new' || status === 'ywraq-pending') {
+              statutDevis = 'envoyé'; // Nouvelle demande ou en attente = devis à traiter
+            } else if (status === 'ywraq-accepted') {
+              statutDevis = 'accepté'; // Devis accepté par le client
+            } else if (status === 'pending' || status === 'on-hold') {
+              statutDevis = 'envoyé'; // Commande en attente
             }
 
             const { data: devis, error: devisError } = await supabase
@@ -347,7 +355,7 @@ export class WooCommerceService {
                 montant_tva: montantTVA,
                 montant_ttc: montantTTC,
                 woocommerce_quote_id: order.id,
-                notes: `Importé depuis WooCommerce - ${status === 'quote-requested' ? 'Demande de devis' : 'Commande'} #${order.id}\nStatut WC: ${order.status}`,
+                notes: `Importé depuis WooCommerce YITH\nDemande #${order.id}\nStatut WC: ${status}`,
                 conditions_paiement: order.payment_method_title || '',
               })
               .select()
@@ -368,7 +376,7 @@ export class WooCommerceService {
                 .from('produits')
                 .select('id')
                 .eq('woocommerce_id', wooId)
-                .maybeSingle(); // ← Correction
+                .maybeSingle();
 
               // Les prix sont déjà en HT
               const prixUnitaireHT = typeof item.price === 'number' ? item.price : parseFloat(item.price);
