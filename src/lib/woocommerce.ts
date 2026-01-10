@@ -324,7 +324,7 @@ export class WooCommerceService {
 
             // Créer le devis à partir de la commande/demande WooCommerce
             // Les prix sont déjà en HT sur WooCommerce
-            const montantHT = parseFloat(order.total);
+            const montantHT = typeof order.total === 'number' ? order.total : parseFloat(order.total);
             const montantTVA = montantHT * 0.20;
             const montantTTC = montantHT + montantTVA;
 
@@ -371,8 +371,8 @@ export class WooCommerceService {
                 .maybeSingle(); // ← Correction
 
               // Les prix sont déjà en HT
-              const prixUnitaireHT = parseFloat(item.price);
-              const montantHT = parseFloat(item.total);
+              const prixUnitaireHT = typeof item.price === 'number' ? item.price : parseFloat(item.price);
+              const montantHT = typeof item.total === 'number' ? item.total : parseFloat(item.total);
               const montantTVA = montantHT * 0.20;
               const montantTTC = montantHT + montantTVA;
 
