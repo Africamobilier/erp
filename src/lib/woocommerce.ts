@@ -259,7 +259,8 @@ export class WooCommerceService {
 
       for (const status of statuses) {
         try {
-          const response = await this.makeRequest(`/wp-json/wc/v3/orders?per_page=100&status=${status}`);
+          // Utiliser status[] au lieu de status pour l'API WooCommerce
+          const response = await this.makeRequest(`/wp-json/wc/v3/orders?per_page=100&status[]=${status}`);
           const orders: WooCommerceOrder[] = await response.json();
 
           for (const order of orders) {
