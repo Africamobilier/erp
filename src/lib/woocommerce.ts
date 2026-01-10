@@ -262,7 +262,7 @@ export class WooCommerceService {
               .from('devis')
               .select('id')
               .eq('woocommerce_quote_id', order.id)
-              .single();
+              .maybeSingle(); // ← Correction
 
             if (existingDevis) {
               console.log(`Devis WC #${order.id} déjà importé, ignoré`);
@@ -274,7 +274,7 @@ export class WooCommerceService {
               .from('clients')
               .select('id')
               .eq('woocommerce_id', order.customer_id)
-              .single();
+              .maybeSingle(); // ← Correction
 
             if (!client && order.customer_id > 0) {
               // Créer le client s'il n'existe pas
@@ -323,8 +323,10 @@ export class WooCommerceService {
             if (!client) continue;
 
             // Créer le devis à partir de la commande/demande WooCommerce
-            const montantHT = parseFloat(order.total) / 1.20; // Convertir TTC en HT
-            const montantTVA = parseFloat(order.total) - montantHT;
+            // Les prix sont déjà en HT sur WooCommerce
+            const montantHT = parseFloat(order.total);
+            const montantTVA = montantHT * 0.20;
+            const montantTTC = montantHT + montantTVA;
 
             // Déterminer le statut du devis selon le statut WooCommerce
             let statutDevis: 'brouillon' | 'envoyé' | 'accepté' = 'envoyé';
@@ -343,7 +345,7 @@ export class WooCommerceService {
                 statut: statutDevis,
                 montant_ht: montantHT,
                 montant_tva: montantTVA,
-                montant_ttc: parseFloat(order.total),
+                montant_ttc: montantTTC,
                 woocommerce_quote_id: order.id,
                 notes: `Importé depuis WooCommerce - ${status === 'quote-requested' ? 'Demande de devis' : 'Commande'} #${order.id}\nStatut WC: ${order.status}`,
                 conditions_paiement: order.payment_method_title || '',
@@ -359,16 +361,20 @@ export class WooCommerceService {
             // Ajouter les lignes de devis
             let ordre = 0;
             for (const item of order.line_items) {
-              // Trouver le produit
+              // Chercher le produit par variation_id d'abord, sinon product_id
+              const wooId = item.variation_id > 0 ? item.variation_id : item.product_id;
+              
               const { data: produit } = await supabase
                 .from('produits')
                 .select('id')
-                .eq('woocommerce_id', item.product_id)
-                .single();
+                .eq('woocommerce_id', wooId)
+                .maybeSingle(); // ← Correction
 
-              const prixUnitaireHT = item.price / 1.20;
-              const montantHT = parseFloat(item.total) / 1.20;
-              const montantTVA = parseFloat(item.total) - montantHT;
+              // Les prix sont déjà en HT
+              const prixUnitaireHT = parseFloat(item.price);
+              const montantHT = parseFloat(item.total);
+              const montantTVA = montantHT * 0.20;
+              const montantTTC = montantHT + montantTVA;
 
               await supabase
                 .from('lignes_devis')
@@ -382,7 +388,7 @@ export class WooCommerceService {
                   montant_ht: montantHT,
                   tva_pourcentage: 20,
                   montant_tva: montantTVA,
-                  montant_ttc: parseFloat(item.total),
+                  montant_ttc: montantTTC,
                   ordre: ordre++,
                 });
             }

@@ -369,6 +369,7 @@ export interface WooCommerceOrder {
     id: number;
     name: string;
     product_id: number;
+    variation_id: number; // ID de la variation si c'est un produit variable
     quantity: number;
     subtotal: string;
     total: string;
