@@ -345,9 +345,23 @@ export class WooCommerceService {
               statutDevis = 'envoyé'; // Commande en attente
             }
 
+            // Générer le numéro de devis
+            const { data: lastDevis } = await supabase
+              .from('devis')
+              .select('numero_devis')
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            const lastNumber = lastDevis?.numero_devis 
+              ? parseInt(lastDevis.numero_devis.split('-')[1]) 
+              : 0;
+            const numeroDevis = `DEV-${String(lastNumber + 1).padStart(6, '0')}`;
+
             const { data: devis, error: devisError } = await supabase
               .from('devis')
               .insert({
+                numero_devis: numeroDevis,
                 client_id: client.id,
                 date_devis: order.date_created.split('T')[0],
                 date_validite: new Date(new Date(order.date_created).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +30 jours
