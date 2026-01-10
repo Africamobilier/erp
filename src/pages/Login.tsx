@@ -54,12 +54,12 @@ export function Login() {
         {/* Logo et Titre */}
         <div className="text-center mb-8">
           <img 
-            src="/africa-mobilier-logo2.png" 
-            alt="Africa Mobilier" 
+            src="/maghreb-office-logo.png" 
+            alt="Maghreb Office" 
             className="h-40 mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold text-white mb-2">
-            Système de Gestion Interne
+            Maghreb Office ERP
           </h1>
           <p className="text-primary-100">
             Excellence marocaine, Vision africaine
@@ -170,12 +170,37 @@ export function Login() {
               )}
             </button>
           </form>
+
+          {/* Informations de test */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center mb-2">
+              Comptes de test disponibles :
+            </p>
+            <div className="space-y-1 text-xs text-gray-600">
+              <div className="flex justify-between">
+                <span>Admin:</span>
+                <span className="font-mono">admin@maghreboffice.ma</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Directeur Général:</span>
+                <span className="font-mono">dg@maghreboffice.ma</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Directeur Commercial:</span>
+                <span className="font-mono">dc@maghreboffice.ma</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Commercial:</span>
+                <span className="font-mono">commercial@maghreboffice.ma</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-primary-100 text-sm">
-            © 2026 Africa Mobilier - Tous droits réservés
+            © 2026 Maghreb Office - Tous droits réservés
           </p>
         </div>
       </div>

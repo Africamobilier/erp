@@ -1,6 +1,6 @@
 // ============================================
 // FONCTIONS DE CONVERSION DOCUMENTS
-// Africa Mobilier ERP
+// Maghreb Office ERP
 // ============================================
 
 import { supabase } from './supabase';

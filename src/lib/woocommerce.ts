@@ -141,24 +141,29 @@ export class WooCommerceService {
       let synced = 0;
 
       for (const product of products) {
+        // Calculer le prix HT (WooCommerce donne le prix TTC)
+        const prixTTC = parseFloat(product.price || product.regular_price || '0');
+        const prixHT = prixTTC > 0 ? prixTTC / 1.20 : 0;
+
         const produitData: Partial<Produit> = {
           code_produit: product.sku || `WC-${product.id}`,
           designation: product.name,
           description: product.description,
           categorie: product.categories[0]?.name,
-          prix_unitaire_ht: parseFloat(product.regular_price) / 1.20, // Convertir TTC en HT (TVA 20%)
+          prix_unitaire_ht: prixHT,
           stock_disponible: product.stock_quantity || 0,
           woocommerce_id: product.id,
+          woocommerce_sku: product.sku,
           image_url: product.images[0]?.src,
           actif: true,
         };
 
         // Vérifier si le produit existe déjà
-        const { data: existing } = await supabase
+        const { data: existing, error: existingError } = await supabase
           .from('produits')
           .select('id')
           .eq('woocommerce_id', product.id)
-          .single();
+          .maybeSingle(); // ← Utiliser maybeSingle() au lieu de single()
 
         if (existing) {
           // Mise à jour

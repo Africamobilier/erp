@@ -54,15 +54,15 @@ export function DevisPDF({ devis, onClose }: DevisPDFProps) {
           <div className="flex justify-between items-start mb-8">
             <div>
               <img 
-                src="/africa-mobilier-logo.png" 
-                alt="Africa Mobilier" 
+                src="/maghreb-office-logo.png" 
+                alt="Maghreb Office" 
                 className="h-20 mb-4"
               />
               <div className="text-sm text-gray-600">
                 <p className="font-semibold text-gray-900">AFRICA MOBILIER</p>
                 <p>Casablanca, Maroc</p>
                 <p>Tél: +212 XXX-XXXXXX</p>
-                <p>Email: contact@africamobilier.com</p>
+                <p>Email: contact@maghreboffice.com</p>
                 <p>ICE: XXXXXXXXXX</p>
               </div>
             </div>
@@ -157,7 +157,7 @@ export function DevisPDF({ devis, onClose }: DevisPDFProps) {
 
           {/* Footer */}
           <div className="mt-12 pt-6 border-t text-center text-xs text-gray-500">
-            <p>Africa Mobilier - Excellence marocaine, Vision africaine</p>
+            <p>Maghreb Office - Excellence marocaine, Vision africaine</p>
             <p>RC: XXXXXX - ICE: XXXXXXXXXX - Patente: XXXXXX</p>
           </div>
         </div>

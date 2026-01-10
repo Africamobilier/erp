@@ -1,4 +1,4 @@
-// Types pour l'ERP Africa Mobilier
+// Types pour l'ERP Maghreb Office
 
 export type StatutProspect = 'prospect' | 'client';
 export type SourceProspect = 'woocommerce' | 'manuel' | 'telephone' | 'visite' | 'email';

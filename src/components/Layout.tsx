@@ -84,8 +84,8 @@ export function Layout({ children }: LayoutProps) {
             {sidebarOpen ? (
               <div className="flex items-center space-x-3">
                 <img 
-                  src="/africa-mobilier-logo.png" 
-                  alt="Africa Mobilier" 
+                  src="/maghreb-office-logo.png" 
+                  alt="Maghreb Office" 
                   className="h-16 w-auto"
                 />
               </div>
@@ -189,7 +189,7 @@ export function Layout({ children }: LayoutProps) {
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-800">
-              Africa Mobilier ERP
+              Maghreb Office ERP
             </h1>
             <div className="flex items-center space-x-4">
               {profile && (

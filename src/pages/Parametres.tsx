@@ -9,14 +9,14 @@ export function Parametres() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    nom_entreprise: 'Africa Mobilier',
+    nom_entreprise: 'Maghreb Office',
     adresse: '',
     ville: 'Casablanca',
     code_postal: '',
     pays: 'Maroc',
     telephone: '',
-    email: 'contact@africamobilier.ma',
-    site_web: 'www.africamobilier.ma',
+    email: 'contact@maghreboffice.ma',
+    site_web: 'www.maghreboffice.ma',
     ice_numero: '',
     rc_numero: '',
     tva_numero: '',
@@ -43,14 +43,14 @@ export function Parametres() {
 
       if (data) {
         setFormData({
-          nom_entreprise: data.nom_entreprise || 'Africa Mobilier',
+          nom_entreprise: data.nom_entreprise || 'Maghreb Office',
           adresse: data.adresse || '',
           ville: data.ville || 'Casablanca',
           code_postal: data.code_postal || '',
           pays: data.pays || 'Maroc',
           telephone: data.telephone || '',
-          email: data.email || 'contact@africamobilier.ma',
-          site_web: data.site_web || 'www.africamobilier.ma',
+          email: data.email || 'contact@maghreboffice.ma',
+          site_web: data.site_web || 'www.maghreboffice.ma',
           ice_numero: data.ice_numero || '',
           rc_numero: data.rc_numero || '',
           tva_numero: data.tva_numero || '',
