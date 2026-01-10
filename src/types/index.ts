@@ -313,6 +313,7 @@ export interface WooCommerceProduct {
   name: string;
   slug: string;
   permalink: string;
+  type: string; // 'simple' | 'variable' | 'grouped' | 'external'
   price: string;
   regular_price: string;
   sale_price: string;
