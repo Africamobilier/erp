@@ -84,7 +84,7 @@ export function Layout({ children }: LayoutProps) {
             {sidebarOpen ? (
               <div className="flex items-center space-x-3">
                 <img 
-                  src="/maghreb-office-logo.png" 
+                  src="/maghreb-office-logo1.png" 
                   alt="Maghreb Office" 
                   className="h-16 w-auto"
                 />
