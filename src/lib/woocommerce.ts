@@ -153,7 +153,6 @@ export class WooCommerceService {
           prix_unitaire_ht: prixHT,
           stock_disponible: product.stock_quantity || 0,
           woocommerce_id: product.id,
-          woocommerce_sku: product.sku,
           image_url: product.images[0]?.src,
           actif: true,
         };
