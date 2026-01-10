@@ -141,9 +141,8 @@ export class WooCommerceService {
       let synced = 0;
 
       for (const product of products) {
-        // Calculer le prix HT (WooCommerce donne le prix TTC)
-        const prixTTC = parseFloat(product.price || product.regular_price || '0');
-        const prixHT = prixTTC > 0 ? prixTTC / 1.20 : 0;
+        // Les prix WooCommerce sont déjà en HT
+        const prixHT = parseFloat(product.price || product.regular_price || '0');
 
         const produitData: Partial<Produit> = {
           code_produit: product.sku || `WC-${product.id}`,
