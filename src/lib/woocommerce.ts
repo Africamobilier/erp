@@ -66,13 +66,15 @@ export class WooCommerceService {
       throw new Error('Configuration WooCommerce non disponible');
     }
 
-    const url = `${this.config.site_url}${endpoint}`;
-    const auth = btoa(`${this.config.consumer_key}:${this.config.consumer_secret}`);
+    // Utiliser le proxy Vercel pour éviter les problèmes CORS
+    const proxyUrl = `/api/wc-proxy?endpoint=${encodeURIComponent(endpoint)}`;
 
-    return fetch(url, {
+    return fetch(proxyUrl, {
       ...options,
       headers: {
-        'Authorization': `Basic ${auth}`,
+        'X-WC-URL': this.config.site_url,
+        'X-WC-Consumer-Key': this.config.consumer_key,
+        'X-WC-Consumer-Secret': this.config.consumer_secret,
         'Content-Type': 'application/json',
         ...options.headers,
       },
